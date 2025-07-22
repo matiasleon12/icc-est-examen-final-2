@@ -1,18 +1,26 @@
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import controllers.MaquinaController;
 import models.Maquina;
 
 public class App {
     public static void main(String[] args) throws Exception {
+        
         List<Maquina> maquinas = crearMaquinas();
+    
+        
+
 
     }
 
-    static List<Maquina> crearMaquinas() {
+    static List<Maquina> crearMaquinas(){
 
         List<Maquina> maquinas = Arrays.asList(
                 new Maquina("Controlador20", "155.25.220.238", Arrays.asList(21, 30, 29, 16)),
@@ -65,7 +73,45 @@ public class App {
                 new Maquina("Nodo7", "23.248.75.5", Arrays.asList(18, 28, 10, 27, 29)),
                 new Maquina("Nodo6", "169.238.150.174", Arrays.asList(6, 14, 3)),
                 new Maquina("DB13", "71.248.50.86", Arrays.asList(17, 11, 12)));
+
+
+        MaquinaController controller = new MaquinaController();
+
+        Stack<Maquina> filtradas = controller.filtrarPorSubred(maquinas, 20);
+        System.out.println("Máquinas con subred > 100 (orden original):");
+        for (Maquina m : filtradas) {
+            System.out.println(m.getNombre() + " - Subred: " + m.getSubred());
+        }
+
+        
+        TreeSet<Maquina> ordenadas = controller.ordenarPorSubred(filtradas);
+        System.out.println("\nMáquinas ordenadas por subred DESC y nombre ASC:");
+        for (Maquina m : ordenadas) {
+            System.out.println(m.getNombre() + " - Subred: " + m.getSubred());
+        }
+
+        
+        TreeMap<Integer, Queue<Maquina>> agrupadas = controller.agruparPorRiesgo(maquinas);
+        System.out.println("\nMáquinas agrupadas por riesgo:");
+        for (Map.Entry<Integer, Queue<Maquina>> entry : agrupadas.entrySet()) {
+            System.out.println("Riesgo " + entry.getKey() + ":");
+            for (Maquina m : entry.getValue()) {
+                System.out.println("  " + m.getNombre());
+            }
+        }
+
+        
+        Stack<Maquina> grupoExplotado = controller.explotarGrupo(agrupadas);
+        System.out.println("\nGrupo explotado (LIFO):");
+        while (!grupoExplotado.isEmpty()) {
+            Maquina m = grupoExplotado.pop();
+            System.out.println(m.getNombre() + " - Riesgo: " + m.getRiesgo());
+        
+    
+}
+
         return maquinas;
 
     }
 }
+
